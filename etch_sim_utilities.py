@@ -2,6 +2,7 @@ import numpy as np
 import pyvista as pv
 import matplotlib as mpl
 from sklearn.neighbors import NearestNeighbors, KNeighborsRegressor
+from pyvistaqt import BackgroundPlotter
 
 # helper function s for cellular automata silicon ethcing simulation
 
@@ -299,7 +300,7 @@ def make_grid(containers,cell_size):
         
 
 def plot_subset_index_cells(grid,i_cell,i_neighbors=np.array([])):
-    plotter = pv.BackgroundPlotter()
+    plotter = BackgroundPlotter()
     plotter.add_mesh(grid.extract_all_edges(), color='k', label='whole mesh')
     if i_neighbors.size != 0:
         plotter.add_mesh(grid.extract_cells(i_neighbors), color=True, 
@@ -326,7 +327,7 @@ def plot_subset_cells(grid,subset=None,scalar='z',invert=False):
         plot_grid = grid.extract_cells(extract_idx)
     else:
         plot_grid = grid
-    plotter = pv.BackgroundPlotter()
+    plotter = BackgroundPlotter()
     if scalar == 'z':
         s = plot_grid.points[:,2]
     else:

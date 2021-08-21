@@ -9,6 +9,7 @@ import open3d as o3d
 import shapely.geometry as geometry
 import time
 #from skimage import measure
+from pyvistaqt import BackgroundPlotter
 from ast import literal_eval
 from copy import deepcopy
 from scipy.spatial import distance as dist
@@ -21,7 +22,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from scipy.interpolate import splprep, splev
 from etch_sim_utilities import *
 
-nps = pv.vtk.util.numpy_support
+#nps = pv.vtk.util.numpy_support
 
 mpl.style.use('default')
 
@@ -66,8 +67,11 @@ recipe_steps = {'step01':{'bosch':15,'iso':100,'cycles':4},
 
 
 # load mask
-im_dir = 'C:/Users/nicas/Documents/E241-MicroNanoFab/masks/'
-im_file = 'python_model_fil_sq.png'
+im_dir = './ExampleMasks/'
+im_file = 'fillet_sq_example_mask.png'
+#im_file = 'python_model_mask_v0.png'
+#im_file = 'python_model_mask_v1A.png'
+im_file = 'python_model_mask_v2.png'
 pixel_um_conv = 276/100  # px/um
 gap = 249/pixel_um_conv
 # 151.37/100  # for R2_C2
@@ -78,8 +82,7 @@ im_path = im_dir + im_file
 curr_im = cv2.imread(im_path, cv2.IMREAD_ANYDEPTH)   
 curr_im = cv2.GaussianBlur(curr_im,(3,3),0)
 rgb_im = cv2.cvtColor(curr_im, cv2.COLOR_GRAY2RGB)
-cont_im, conts, hier = cv2.findContours(curr_im, cv2.RETR_LIST, 
-                                        cv2.CHAIN_APPROX_NONE)    
+conts, hier = cv2.findContours(curr_im, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)    
 conts_im = cv2.drawContours(rgb_im, conts, -1, (0,255,0),3)
 # show the contour to verify 
 dummy_i = im_file.find('.png')
@@ -285,7 +288,7 @@ for step_i, step in enumerate(loop_steps,start=1):
         print('making plot or %s' % step)
         neigh_pts,neigh_states,_ = make_cloud([neighbor_cells])
         neigh_obj = pv.PolyData(neigh_pts)
-        plotter = pv.BackgroundPlotter()
+        plotter = BackgroundPlotter()
         plotter.isometric_view()
         plotter.add_mesh(neigh_obj, show_edges=True,
                          scalars=neigh_obj.points[:,2],
@@ -492,7 +495,7 @@ neigh_pts,neigh_states,_ = make_cloud([neighbor_cells])
 plot_point_cloud((exposed_pts,neigh_pts),scalar='z')
 
 with_data = [g for g in etch_grid if len(etch_grid[g]) != 0]
-plot_png_dir = 'C:/Users/nicas/Documents/E241-MicroNanoFab/codes/' + \
+plot_png_dir = './codes/' + \
                'etch_model_version5_1/'
                
 #dict_file = plot_png_dir + 'exposed_cells_mask5_R5_C3.txt'
@@ -598,7 +601,7 @@ for ind,step in enumerate(select_data):#range(20):
     cells = pv.PolyData(exp_cells)
     neighs = pv.PolyData(neigh_cells)
     
-    plotter = pv.BackgroundPlotter(title='exp_cells', 
+    plotter = BackgroundPlotter(title='exp_cells', 
                                    window_size=[1024, 768])
     
     plotter.add_mesh(neighs, show_edges=True,
@@ -637,7 +640,7 @@ exp_cells,exp_states = pts[exp_cell_idx],states[exp_cell_idx]
 
 exposed_obj = pv.read(vtk_save_exp_obj)#pv.PolyData(exp_cells) 
 smooth = exposed_obj.smooth(n_iter=100)
-plotter = pv.BackgroundPlotter(title=loop_steps[-1], 
+plotter = BackgroundPlotter(title=loop_steps[-1], 
                                window_size=[1024, 768])
 plotter.add_mesh(exposed_obj, show_edges=True,
                  scalars=exposed_obj.points[:,2],
@@ -651,7 +654,7 @@ plotter.add_scalar_bar(title='z_height',height=0.08,width=0.4,
 
 neigh_obj = pv.read(vtk_save_neigh_obj)#pv.PolyData(exp_cells) 
 smooth = neigh_obj.smooth(n_iter=1000)
-plotter = pv.BackgroundPlotter(title=loop_steps[-1], 
+plotter = BackgroundPlotter(title=loop_steps[-1], 
                                window_size=[1024, 768])
 plotter.add_mesh(neigh_obj, show_edges=True,
                  scalars=smooth.points[:,2],
@@ -672,7 +675,7 @@ obj = make_grid([pts],cell_size)
 #obj = make_grid([np.array(obj.points)],cell_size)
 
 slices = obj.slice(normal=[1,1,0])
-plotter = pv.BackgroundPlotter(window_size=[1024, 768])
+plotter = BackgroundPlotter(window_size=[1024, 768])
 plotter.add_mesh(obj, show_edges=False,
                          scalars=obj.points[:,2],
                          cmap='inferno',
