@@ -1,0 +1,5 @@
+__pycache__/
+comb_contours/
+comb_contours_3d/
+codes/
+ExampleMasks/*_out.png
