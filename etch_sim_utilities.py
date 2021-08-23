@@ -1,4 +1,5 @@
 import numpy as np
+import vtk
 import pyvista as pv
 import matplotlib as mpl
 from sklearn.neighbors import NearestNeighbors, KNeighborsRegressor
@@ -239,7 +240,7 @@ def make_grid(containers,cell_size):
     for container in containers:
         cells = []
         offset = np.arange(0,9*len(container),9)
-        cell_type = np.array([pv.vtk.VTK_HEXAHEDRON]*len(container))
+        cell_type = np.array([vtk.VTK_HEXAHEDRON]*len(container))
         point_count = 0
         pts = np.array([])
         if type(container) == set: container = list(container)
