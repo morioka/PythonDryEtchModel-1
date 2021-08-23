@@ -53,6 +53,12 @@ def horiz_etch(cont,horiz_rate,t_step,norm_span,sm_window):
     out_cont[-1,0] = out_cont[0,0]
     out_cont[-1,1] = out_cont[0,1]
     # smooth with spline
+    if True:  # for python_model_mask_v*.png
+        # avoid ValueError due to some (the last two) elements are identical
+        # https://stackoverflow.com/questions/61858600/i-think-scipy-interpolate-might-be-broken-or-am-i-using-it-wrong
+        # https://stackoverflow.com/questions/47948453/scipy-interpolate-splprep-error-invalid-inputs?rq=1
+        out_cont[-2,0] = out_cont[-2, 0] + 1e-8  # add epsilon
+        out_cont[-2,1] = out_cont[-2, 1] + 1e-8  # add epsilon
     tck, u = splprep(out_cont.T, u=None, s=0, per=1) 
     u_new = np.linspace(u.min(), u.max(), len(cont))
     x_spline, y_spline = splev(u_new, tck, der=0)
@@ -79,8 +85,11 @@ opening = 100  # um
 plt.close('all')
 
 # load mask
-im_dir = 'C:/Users/nicas/Documents/E241-MicroNanoFab/masks/'
-im_file = 'python_model_fil_sq.png'
+im_dir = './ExampleMasks/'
+im_file = 'fillet_sq_example_mask.png'
+#im_file = 'python_model_mask_v0.png'
+#im_file = 'python_model_mask_v1A.png'
+im_file = 'python_model_mask_v2.png'
 im_path = im_dir + im_file
 curr_im = cv2.imread(im_path, cv2.IMREAD_ANYDEPTH)   
 curr_im = cv2.GaussianBlur(curr_im,(3,3),0)
@@ -88,7 +97,7 @@ curr_im = cv2.GaussianBlur(curr_im,(3,3),0)
 
 rgb_im = cv2.cvtColor(curr_im, cv2.COLOR_GRAY2RGB)
      
-cont_im, conts, hier = cv2.findContours(curr_im, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)    
+conts, hier = cv2.findContours(curr_im, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
 conts_im = cv2.drawContours(rgb_im, conts, -1, (0,255,0),3)
 
 
@@ -113,7 +122,7 @@ vert_rate = 287/600  # um/s
 
 horiz_rate = 77/600  # um/s
 pixel_um_conv = 251/90.4672  # px/um
-cmap = 'gnuplot'  # 'inferno' 'viridis'  # 'hot'
+cmap = mpl.cm.get_cmap('viridis') # 'gnuplot'  # 'inferno' 'viridis'  # 'hot'
 vmin = -290  # expected range of depth for color bar (min)
 vmax = 0
 # for plotting srface plot
@@ -331,9 +340,9 @@ for i_t,t in enumerate(range(t_start, t_end, t_step)):
     cbar = mpl.colorbar.ColorbarBase(ax1_2d_cont, cmap=cmap,
                                      norm=mpl.colors.Normalize(vmin=vmin, vmax=vmax),
                                      label=' etch depth [um]')
-    cbar.set_clim(vmin, vmax)    
+    contourplot.set_clim(vmin, vmax)    
     ax1_2d_cont.autoscale()    
-    out_fig = 'C:/Users/nicas/Documents/E241-MicroNanoFab/codes/comb_contours/' + \
+    out_fig = './codes/comb_contours/' + \
     str(t) + '.png'
     plt.savefig(out_fig, bbox_inches='tight')
     plt.close()
@@ -360,10 +369,10 @@ for i_t,t in enumerate(range(t_start, t_end, t_step)):
     cbar = mpl.colorbar.ColorbarBase(ax2_3d_surf, cmap=cmap,
                                      norm=mpl.colors.Normalize(vmin=vmin, vmax=vmax),
                                      label=' etch depth [um]')
-    cbar.set_clim(vmin, vmax)    
+    surf.set_clim(vmin, vmax)    
     ax2_3d_surf.autoscale()    
 #    fig_3d_surf.colorbar(surf, shrink=0.5, aspect=5)
-    out_fig = 'C:/Users/nicas/Documents/E241-MicroNanoFab/codes/comb_contours_3d/' + \
+    out_fig = './codes/comb_contours_3d/' + \
     str(t) + '.png'
     plt.savefig(out_fig, bbox_inches='tight')
     plt.close()
