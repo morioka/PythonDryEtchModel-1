@@ -65,7 +65,6 @@ recipe_steps = {'step01':{'bosch':15,'iso':100,'cycles':4},
 #                'step02':{'bosch':300,'iso':None,'cycles':300},
                 'step03':{'bosch':None,'iso':800,'cycles':1}}
 
-
 # load mask
 im_dir = './ExampleMasks/'
 im_file = 'fillet_sq_example_mask.png'
@@ -602,7 +601,7 @@ for ind,step in enumerate(select_data):#range(20):
     neighs = pv.PolyData(neigh_cells)
     
     plotter = BackgroundPlotter(title='exp_cells', 
-                                   window_size=[1024, 768])
+                                   window_size=(1024, 768))
     
     plotter.add_mesh(neighs, show_edges=True,
                      scalars=neighs.points[:,2],
@@ -633,7 +632,7 @@ states = etch_grid[loop_steps[-1]][1]
 iden = etch_grid[loop_steps[-1]][2]
 
 exp_cell_idx = np.where(iden == 1)[0]
-      
+
 exp_cells,exp_states = pts[exp_cell_idx],states[exp_cell_idx]
 
 
@@ -641,7 +640,7 @@ exp_cells,exp_states = pts[exp_cell_idx],states[exp_cell_idx]
 exposed_obj = pv.read(vtk_save_exp_obj)#pv.PolyData(exp_cells) 
 smooth = exposed_obj.smooth(n_iter=100)
 plotter = BackgroundPlotter(title=loop_steps[-1], 
-                               window_size=[1024, 768])
+                               window_size=(1024, 768))
 plotter.add_mesh(exposed_obj, show_edges=True,
                  scalars=exposed_obj.points[:,2],
                  point_size=8,
@@ -655,7 +654,7 @@ plotter.add_scalar_bar(title='z_height',height=0.08,width=0.4,
 neigh_obj = pv.read(vtk_save_neigh_obj)#pv.PolyData(exp_cells) 
 smooth = neigh_obj.smooth(n_iter=1000)
 plotter = BackgroundPlotter(title=loop_steps[-1], 
-                               window_size=[1024, 768])
+                               window_size=(1024, 768))
 plotter.add_mesh(neigh_obj, show_edges=True,
                  scalars=smooth.points[:,2],
                  point_size=8,
@@ -675,7 +674,7 @@ obj = make_grid([pts],cell_size)
 #obj = make_grid([np.array(obj.points)],cell_size)
 
 slices = obj.slice(normal=[1,1,0])
-plotter = BackgroundPlotter(window_size=[1024, 768])
+plotter = BackgroundPlotter(window_size=(1024, 768))
 plotter.add_mesh(obj, show_edges=False,
                          scalars=obj.points[:,2],
                          cmap='inferno',
